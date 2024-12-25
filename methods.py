@@ -105,49 +105,35 @@ def jacobi_iteration(a, b, n_iter=25, tol=1e-10):
     return x_new
 
 
-def gauss_seidel(a, n, tol=1e-4, max_iter=1000):
+def gauss_seidel(a, b, n_iterations=25, tolerance=1e-4):
     """
-    Solves a system of linear equations Ax = b using the Gauss-Seidel method.
+    Solves a system of linear equations Ax = b using the Gauss-Seidel Method.
 
     Parameters:
-        a (list of lists): Augmented matrix [A|b] of size n x (n+1).
-        n (int): The number of unknowns (size of the system).
-        tol (float): Tolerance for convergence (default = 1e-4).
-        max_iter (int): Maximum number of iterations (default = 1000).
+        a (numpy.ndarray): Coefficient matrix (n x n)
+        b (numpy.ndarray): Constant terms vector (n x 1)
+        n_iterations (int): Maximum number of iterations
+        tolerance (float): Convergence tolerance
 
     Returns:
-        x (list): Solution vector.
+        numpy.ndarray: Solution vector x
     """
-    # Initialize x and y (old solutions)
-    x = np.zeros(n)
-    y = np.zeros(n)
-    itr = 0
+    n = len(b)
+    x = np.zeros(n)  # Initial guess
+    y = np.zeros(n)  # Previous iteration values
 
-    print("Starting Gauss-Seidel Iteration:")
-    while itr < max_iter:
-        itr += 1
+    for itr in range(1, n_iterations + 1):
         for i in range(n):
-            # Start with the right-hand side value (b)
-            x[i] = a[i][-1]
-            for j in range(n):
-                if i != j:  # Ignore diagonal element
-                    x[i] -= a[i][j] * x[j]
-            # Divide by the diagonal element
-            x[i] /= a[i][i]
+            sum1 = sum(a[i][j] * x[j] for j in range(n) if j != i)
+            x[i] = (b[i] - sum1) / a[i][i]
 
         # Check for convergence
-        error = max(abs(x[k] - y[k]) for k in range(n))
-        if error < tol:
+        if all(abs(x[k] - y[k]) <= tolerance for k in range(n)):
             print(f"Converged in {itr} iterations.")
-            break
+            return x
 
         # Update y for the next iteration
         y = x.copy()
 
-        # Print intermediate results
-        print(f"Iteration {itr}: {x}")
-
-    else:
-        print("Reached maximum iterations without convergence.")
-
+    print("Maximum iterations reached without convergence.")
     return x
