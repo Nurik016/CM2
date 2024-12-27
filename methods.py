@@ -12,25 +12,25 @@ def cramer_method(A, b):
     Returns:
     x : np.array : Solution to the system of equations
     """
-    # Check if the matrix is square
+
     n = A.shape[0]
     if A.shape[1] != n:
         raise ValueError("Matrix A must be square")
 
-    # Compute the determinant of the main matrix
+    # Determinant
     det_A = np.linalg.det(A)
     if det_A == 0:
-        raise ValueError("The determinant of matrix A is 0. The system has no unique solution.")
+        raise ValueError(f"The determinant of matrix A is 0. The system has no unique solution.")
 
-    # Initialize the solution vector
+    # Solution vector
     x = np.zeros(n)
 
-    # Loop through each column to replace and solve
+    # Loop through each column
     for k in range(n):
-        D = A.copy()  # Copy of the matrix A
-        D[:, k] = b  # Replace the k-th column of matrix A with vector b
-        det_D = np.linalg.det(D)  # Determinant of the modified matrix
-        x[k] = det_D / det_A  # Compute x_k using Cramer's formula
+        D = A.copy()
+        D[:, k] = b  # Replace ka to kb
+        det_D = np.linalg.det(D)  # Determinant modified
+        x[k] = det_D / det_A # k by cramer
 
     return x
 
@@ -47,7 +47,6 @@ def gaussian_elimination(A, b):
     x : np.array : Solution vector
     """
     n = len(b)
-    # Forward Elimination
     for k in range(n - 1):
         for i in range(k + 1, n):
             if A[k][k] == 0:
@@ -82,23 +81,20 @@ def jacobi_iteration(a, b, n_iter=25, tol=1e-10):
     Returns:
         x (numpy array): Solution vector x.
     """
-    n = len(b)  # Number of variables
-    x = np.zeros(n)  # Initialize solution vector with zeros
-    x_new = np.zeros(n)  # Temporary solution for next iteration
+    n = len(b)
+    x = np.zeros(n)
+    x_new = np.zeros(n)
 
     for m in range(n_iter):
         for i in range(n):
-            # Calculate the summation term
             sigma = sum(a[i][j] * x[j] for j in range(n) if i != j)
-            # Update x[i]
             x_new[i] = (b[i] - sigma) / a[i][i]
 
-        # Check for convergence (stopping criterion)
+        # Check convergence (stopping criterion)
         if np.linalg.norm(x_new - x, ord=np.inf) < tol:
             print(f"Converged in {m + 1} iterations.")
             return x_new
 
-        # Update solution vector for the next iteration
         x = x_new.copy()
 
     print("Maximum iterations reached without convergence.")
@@ -119,20 +115,19 @@ def gauss_seidel(a, b, n_iterations=25, tolerance=1e-4):
         numpy.ndarray: Solution vector x
     """
     n = len(b)
-    x = np.zeros(n)  # Initial guess
-    y = np.zeros(n)  # Previous iteration values
+    x = np.zeros(n)
+    y = np.zeros(n)
 
     for itr in range(1, n_iterations + 1):
         for i in range(n):
             sum1 = sum(a[i][j] * x[j] for j in range(n) if j != i)
             x[i] = (b[i] - sum1) / a[i][i]
 
-        # Check for convergence
+        # Check convergence (stopping criterion)
         if all(abs(x[k] - y[k]) <= tolerance for k in range(n)):
             print(f"Converged in {itr} iterations.")
             return x
 
-        # Update y for the next iteration
         y = x.copy()
 
     print("Maximum iterations reached without convergence.")
